@@ -15,7 +15,9 @@ public class PlayerController : MonoBehaviour
     private string FLY_ANIMATION = "fly";
     SpriteRenderer playerRenderer;
 
-    bool fly;
+    private Vector2 direction;
+
+    //bool fly;
 
     private void Awake()
     {
@@ -25,7 +27,15 @@ public class PlayerController : MonoBehaviour
         
     }
 
-   
+    private void OnEnable()
+    {
+        Vector2 position = transform.position;
+        position.y = 0f;
+        transform.position = position;
+        direction = Vector2.zero;
+    }
+
+
     // Update is called once per frame
     void Update()
     {
@@ -38,7 +48,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            playerRb.velocity = Vector2.up * flyForce;
+            direction = Vector2.up * flyForce;
            // playerRb.AddForce(Vector2.up * flyForce * Time.deltaTime, ForceMode2D.Impulse);
         }
     }
