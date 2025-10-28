@@ -1,78 +1,123 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class GameManager : MonoBehaviour
 {
+    // Singleton instance
+    public static GameManager Instance { get; private set; }
+
+    [Header("References")]
     public PlayerController player;
-    private int score;
     public TextMeshProUGUI scoreText;
-    public Text scoreTxt;
     public GameObject playButton;
     public GameObject gameOver;
 
+    [Header("Game State")]
+    private int score;
+    private bool isGameActive;
+
+    // Events for other systems to listen to
+    public static event Action OnGameStart;
+    public static event Action OnGameOver;
+    public static event Action<int> OnScoreChanged;
+    public static event Action OnPause;
+    public static event Action OnResume;
+
+    // Properties for other scripts to access
+    public bool IsGameActive => isGameActive;
+    public int CurrentScore => score;
+
     private void Awake()
     {
+        // Singleton pattern
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Application.targetFrameRate = 60;
         Pause();
     }
 
-    void Play()
+    public void Play()
     {
         score = 0;
         scoreText.text = score.ToString();
-
         playButton.SetActive(false);
         gameOver.SetActive(false);
 
         Time.timeScale = 1f;
+        isGameActive = true;
         player.enabled = true;
 
-        // Destroy all the pipes on the scene before a game
+        // Clean up pipes
         PipesMovement[] pipes = FindObjectsOfType<PipesMovement>();
-        for(int i = 0; i < pipes.Length; i++)
+        for (int i = 0; i < pipes.Length; i++)
         {
             Destroy(pipes[i].gameObject);
         }
+
+        // Notify all systems that game has started
+        OnGameStart?.Invoke();
     }
 
-    void Pause()
+    public void Pause()
     {
         Time.timeScale = 0;
+        isGameActive = false;
         player.enabled = false;
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+        OnPause?.Invoke();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Resume()
     {
-        
+        Time.timeScale = 1f;
+        isGameActive = true;
+        player.enabled = true;
+        OnResume?.Invoke();
     }
 
-    public void IncresaseScore()
+    public void IncreaseScore(int amount = 1)
     {
-        Debug.Log("Scored 1");
-        
-        score++;
-        scoreText.text = score.ToString();
-        //Check this if it works
-        //scoreTxt.text = score.ToString();
+        if (!isGameActive) return;
+
+        score += amount;
+        scoreText.text = $"Score: {score}";
+
+        // Notify systems about score change (for power-ups, levels, etc.)
+        OnScoreChanged?.Invoke(score);
     }
 
     public void GameOver()
     {
+        if (!isGameActive) return;
+
         Debug.Log("Game Over");
+        isGameActive = false;
         gameOver.SetActive(true);
         playButton.SetActive(true);
 
         Pause();
+
+        // Notify all systems
+        OnGameOver?.Invoke();
     }
 
+    private void OnDestroy()
+    {
+        // Clean up singleton
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 }

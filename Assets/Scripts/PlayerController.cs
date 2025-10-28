@@ -4,27 +4,30 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private float moveForce = 1f;
-    [SerializeField]
-    private float flyForce = 15f;
+    [Header("Movement Settings")]
+    [SerializeField] private float flyForce = 15f;
+    [SerializeField] private float maxVelocity = 10f;
 
+    [Header("Components")]
     private Rigidbody2D playerRb;
     private Animator playerAnimator;
+    private SpriteRenderer playerRenderer;
 
-    private string FLY_ANIMATION = "fly";
-    SpriteRenderer playerRenderer;
+    [Header("State")]
+    private bool isInvincible = false;
+    private float currentSpeedMultiplier = 1f;
 
-    private Vector2 direction;
+    private const string FLY_ANIMATION = "fly";
 
-    //bool fly;
+    // Properties for power-ups to modify
+    public bool IsInvincible => isInvincible;
+    public float SpeedMultiplier => currentSpeedMultiplier;
 
     private void Awake()
     {
         playerRenderer = GetComponent<SpriteRenderer>();
         playerAnimator = GetComponent<Animator>();
         playerRb = GetComponent<Rigidbody2D>();
-        
     }
 
     private void OnEnable()
@@ -32,42 +35,89 @@ public class PlayerController : MonoBehaviour
         Vector2 position = transform.position;
         position.y = 0f;
         transform.position = position;
-        direction = Vector2.zero;
+        playerRb.velocity = Vector2.zero;
+
+        // Reset power-up effects
+        isInvincible = false;
+        currentSpeedMultiplier = 1f;
     }
 
-
-    // Update is called once per frame
     void Update()
     {
+        if (!GameManager.Instance.IsGameActive) return;
+
         PlayerMovement();
-        //transform.Translate(Vector2.right * moveForce * Time.deltaTime);
         AnimatePlayer();
+        ClampVelocity();
     }
 
     void PlayerMovement()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
-            direction = Vector2.up * flyForce;
-           // playerRb.AddForce(Vector2.up * flyForce * Time.deltaTime, ForceMode2D.Impulse);
+            // Reset velocity before applying force
+            playerRb.velocity = Vector2.zero;
+            // Apply force with speed multiplier (for slow-mo power-up)
+            playerRb.AddForce(Vector2.up * flyForce * currentSpeedMultiplier, ForceMode2D.Impulse);
+        }
+    }
+
+    void ClampVelocity()
+    {
+        // Prevent crazy speeds
+        if (playerRb.velocity.magnitude > maxVelocity)
+        {
+            playerRb.velocity = playerRb.velocity.normalized * maxVelocity;
         }
     }
 
     void AnimatePlayer()
     {
         playerAnimator.SetBool(FLY_ANIMATION, true);
-
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Obstacle")
+        if (collision.gameObject.CompareTag("Obstacle"))
         {
-            FindObjectOfType<GameManager>().GameOver();          
+            if (!isInvincible)
+            {
+                GameManager.Instance.GameOver();
+            }
+            else
+            {
+                Debug.Log("Hit obstacle but invincible!");
+            }
         }
-        else if(collision.gameObject.tag == "Scoring")
+        else if (collision.gameObject.CompareTag("Scoring"))
         {
-            FindObjectOfType<GameManager>().IncresaseScore();
+            GameManager.Instance.IncreaseScore();
         }
+        else if (collision.gameObject.CompareTag("PowerUp"))
+        {
+            // Power-up system will handle this
+            collision.gameObject.SetActive(false);
+        }
+    }
+
+    // Power-up methods
+    public void SetInvincibility(bool invincible)
+    {
+        isInvincible = invincible;
+        // Visual feedback - make player semi-transparent when invincible
+        Color color = playerRenderer.color;
+        color.a = invincible ? 0.5f : 1f;
+        playerRenderer.color = color;
+    }
+
+    public void SetSpeedMultiplier(float multiplier)
+    {
+        currentSpeedMultiplier = multiplier;
+    }
+
+    public void ResetPowerUpEffects()
+    {
+        SetInvincibility(false);
+        SetSpeedMultiplier(1f);
     }
 }
