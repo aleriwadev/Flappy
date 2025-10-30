@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
         currentSpeedMultiplier = 1f;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (!GameManager.Instance.IsGameActive) return;
 

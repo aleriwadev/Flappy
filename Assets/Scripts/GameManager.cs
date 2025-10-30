@@ -27,6 +27,10 @@ public class GameManager : MonoBehaviour
     public static event Action OnPause;
     public static event Action OnResume;
 
+    [Header("Game Settings")]
+    [SerializeField] private float gameOverDelay = 0.5f; // Delay before showing game over UI
+    [SerializeField] private float restartDelay = 0.3f;  // Delay before game actually starts
+
     // Properties for other scripts to access
     public bool IsGameActive => isGameActive;
     public int CurrentScore => score;
@@ -51,7 +55,7 @@ public class GameManager : MonoBehaviour
     public void Play()
     {
         score = 0;
-        scoreText.text = score.ToString();
+        scoreText.text = $"Score: {score}";
         playButton.SetActive(false);
         gameOver.SetActive(false);
 
