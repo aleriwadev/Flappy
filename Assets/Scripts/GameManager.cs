@@ -14,11 +14,15 @@ public class GameManager : MonoBehaviour
     public PlayerController player;
     public TextMeshProUGUI scoreText;
     public GameObject playButton;
+    public GameObject resumeGameButton;
     public GameObject gameOver;
+    public GameObject pausePanel;      // Pause menu panel
+    public GameObject pauseButton;     // Pause button (visible during gameplay)
 
     [Header("Game State")]
     private int score;
     private bool isGameActive;
+    private bool isPaused;
 
     // Events for other systems to listen to
     public static event Action OnGameStart;
@@ -50,13 +54,26 @@ public class GameManager : MonoBehaviour
 
         Application.targetFrameRate = 60;
         Pause();
+        pausePanel.gameObject.SetActive(false);
     }
 
     public void Play()
     {
+        // Disable buttons immediately to prevent double-clicks
+        playButton.SetActive(false);
+
+        // Start game after a brief delay
+        StartCoroutine(StartGameDelayed());
+        pausePanel.SetActive(false);
+    }
+
+    private IEnumerator StartGameDelayed()
+    {
+        yield return new WaitForSecondsRealtime(restartDelay);
+
         score = 0;
         scoreText.text = $"Score: {score}";
-        playButton.SetActive(false);
+        //scoreText.text = score.ToString();
         gameOver.SetActive(false);
 
         Time.timeScale = 1f;
@@ -80,14 +97,21 @@ public class GameManager : MonoBehaviour
         isGameActive = false;
         player.enabled = false;
         OnPause?.Invoke();
+
+        pausePanel.SetActive(true);
     }
 
     public void Resume()
     {
+        if (gameOver.activeSelf) return; // Don tresume if game over
         Time.timeScale = 1f;
         isGameActive = true;
         player.enabled = true;
         OnResume?.Invoke();
+
+        pausePanel.SetActive(false);
+
+
     }
 
     public void IncreaseScore(int amount = 1)
@@ -105,8 +129,19 @@ public class GameManager : MonoBehaviour
     {
         if (!isGameActive) return;
 
-        Debug.Log("Game Over");
         isGameActive = false;
+
+        // Show game over UI after a delay
+        StartCoroutine(GameOverDelayed());
+
+    }
+
+    private IEnumerator GameOverDelayed()
+    {
+        // Wait a moment so player can see what happened
+        yield return new WaitForSecondsRealtime(gameOverDelay);
+
+        Debug.Log("Game Over");
         gameOver.SetActive(true);
         playButton.SetActive(true);
 
