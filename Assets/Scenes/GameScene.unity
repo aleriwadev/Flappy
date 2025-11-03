@@ -1639,11 +1639,11 @@ MonoBehaviour:
   player: {fileID: 1922462193}
   scoreText: {fileID: 804430380}
   playButton: {fileID: 811331330}
-  resumeGameButton: {fileID: 41613138}
+  resumeGameButton: {fileID: 0}
   gameOver: {fileID: 1830642868}
   pausePanel: {fileID: 1573637678}
   pauseButton: {fileID: 964593255}
-  gameOverDelay: 0.5
+  gameOverDelay: 0.2
   restartDelay: 0.3
 --- !u!4 &1309135283
 Transform:
