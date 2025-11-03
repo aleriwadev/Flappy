@@ -23,10 +23,12 @@ public class ObstaclePooling : MonoBehaviour
     }
     public void Spawn()
     {
-        GameObject pipes = Instantiate(prefab, transform.position, Quaternion.identity);
-        pipes.transform.position += Vector3.up * Random.Range(minHeight, maxHeight);
+        if (GameManager.Instance.IsGameActive)
+        {
+            GameObject pipes = Instantiate(prefab, transform.position, Quaternion.identity);
+            pipes.transform.position += Vector3.up * Random.Range(minHeight, maxHeight);
 
-        
+        }
     }
     
 }

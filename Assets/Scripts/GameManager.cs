@@ -114,12 +114,27 @@ public class GameManager : MonoBehaviour
 
     }
 
+    // Replace your IncreaseScore method with this version:
+
     public void IncreaseScore(int amount = 1)
     {
         if (!isGameActive) return;
 
-        score += amount;
+        // Apply score multiplier from power-ups
+        int multipliedAmount = amount;
+        if (PowerUpManager.Instance != null)
+        {
+            multipliedAmount = amount * PowerUpManager.Instance.ScoreMultiplier;
+        }
+
+        score += multipliedAmount;
         scoreText.text = $"Score: {score}";
+
+        // Show multiplier feedback if active
+        if (PowerUpManager.Instance != null && PowerUpManager.Instance.ScoreMultiplier > 1)
+        {
+            scoreText.text = $"Score: {score} (x{PowerUpManager.Instance.ScoreMultiplier})";
+        }
 
         // Notify systems about score change (for power-ups, levels, etc.)
         OnScoreChanged?.Invoke(score);
