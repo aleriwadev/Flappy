@@ -84,8 +84,20 @@ public class PowerUp : MonoBehaviour
 
         if (spriteRenderer != null)
         {
-            spriteRenderer.sprite = icon;
+            // Set the sprite ONLY if an icon is provided
+            if (icon != null)
+            {
+                spriteRenderer.sprite = icon;
+            }
+
+            // Always set the color
             spriteRenderer.color = color;
+
+            Debug.Log($"PowerUp initialized: {type}, Icon: {(icon != null ? icon.name : "NULL")}, Color: {color}");
+        }
+        else
+        {
+            Debug.LogError("SpriteRenderer is NULL on PowerUp!");
         }
     }
 }

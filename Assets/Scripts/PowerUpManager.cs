@@ -108,7 +108,11 @@ public class PowerUpManager : MonoBehaviour
 
         if (powerUpScript != null)
         {
+            // Initialize with the specific power-up's icon and color
             powerUpScript.Initialize(data.type, data.icon, data.color);
+
+            // Debug to see what's spawning
+            Debug.Log($"Spawned {data.type} power-up at {spawnPos} with icon: {(data.icon != null ? data.icon.name : "NULL")}");
         }
     }
 
