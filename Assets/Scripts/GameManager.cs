@@ -73,8 +73,8 @@ public class GameManager : MonoBehaviour
 
         score = 0;
         scoreText.text = $"Score: {score}";
-        //scoreText.text = score.ToString();
         gameOver.SetActive(false);
+        pausePanel.SetActive(false);
 
         Time.timeScale = 1f;
         isGameActive = true;
@@ -85,6 +85,13 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < pipes.Length; i++)
         {
             Destroy(pipes[i].gameObject);
+        }
+
+        // Clean up any remaining power-ups on screen
+        PowerUp[] powerUps = FindObjectsOfType<PowerUp>();
+        for (int i = 0; i < powerUps.Length; i++)
+        {
+            Destroy(powerUps[i].gameObject);
         }
 
         // Notify all systems that game has started
@@ -174,4 +181,6 @@ public class GameManager : MonoBehaviour
             Instance = null;
         }
     }
+
+
 }

@@ -24,7 +24,11 @@ public class PowerUp : MonoBehaviour
 
     private void Update()
     {
-        if (!GameManager.Instance.IsGameActive) return;
+        // Don't move if game isn't active
+        if (GameManager.Instance == null || !GameManager.Instance.IsGameActive)
+        {
+            return;
+        }
 
         // Move left with obstacles
         transform.position += Vector3.left * moveSpeed * Time.deltaTime;
