@@ -6,6 +6,7 @@ public class PipesMovement : MonoBehaviour
 {
     [Header("Movement")]
     public float speed = 2f;
+    private float currentSpeed;
     private float leftEdge;
 
     [Header("Movement Pattern (Optional)")]
@@ -19,14 +20,24 @@ public class PipesMovement : MonoBehaviour
     {
         leftEdge = Camera.main.ScreenToWorldPoint(Vector2.zero).x - 2f;
         startY = transform.position.y;
+
+        // Use level-based speed if LevelManager exists
+        if (LevelManager.Instance != null)
+        {
+            currentSpeed = LevelManager.Instance.CurrentSpeed;
+        }
+        else
+        {
+            currentSpeed = speed;
+        }
     }
 
     private void Update()
     {
         if (!GameManager.Instance.IsGameActive) return;
 
-        // Horizontal movement
-        transform.position += Vector3.left * speed * Time.deltaTime;
+        // Horizontal movement with current speed
+        transform.position += Vector3.left * currentSpeed * Time.deltaTime;
 
         // Optional vertical movement pattern
         if (useVerticalMovement)
