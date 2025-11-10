@@ -41,18 +41,30 @@ public class PowerUpManager : MonoBehaviour
     {
         GameManager.OnGameStart += OnGameStart;
         GameManager.OnGameOver += OnGameOver;
+        LevelManager.OnDifficultyChanged += OnDifficultyChanged;
     }
 
     private void OnDisable()
     {
         GameManager.OnGameStart -= OnGameStart;
         GameManager.OnGameOver -= OnGameOver;
+        LevelManager.OnDifficultyChanged -= OnDifficultyChanged;
     }
 
     private void OnGameStart()
     {
         // Start spawning power-ups
-        InvokeRepeating(nameof(SpawnRandomPowerUp), spawnInterval, spawnInterval);
+        float interval = LevelManager.Instance != null ? LevelManager.Instance.CurrentPowerUpInterval : spawnInterval;
+        InvokeRepeating(nameof(SpawnRandomPowerUp), interval, interval);
+    }
+
+    void OnDifficultyChanged(float speed, float gapSize, float powerUpInterval)
+    {
+        // Restart spawning with new interval
+        CancelInvoke(nameof(SpawnRandomPowerUp));
+        InvokeRepeating(nameof(SpawnRandomPowerUp), powerUpInterval, powerUpInterval);
+
+        Debug.Log($"PowerUpManager: Spawn interval updated to {powerUpInterval}");
     }
 
     private void OnGameOver()

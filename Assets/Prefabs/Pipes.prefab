@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6629502503204938038}
   - component: {fileID: 6279117531465376099}
   m_Layer: 0
-  m_Name: bPipe
+  m_Name: Bottom
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -141,7 +141,7 @@ GameObject:
   - component: {fileID: 7330822257276516417}
   - component: {fileID: 8771364731063404276}
   m_Layer: 0
-  m_Name: Scoring
+  m_Name: ScoreTrigger
   m_TagString: Scoring
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -270,7 +270,7 @@ GameObject:
   - component: {fileID: 3306490095090553891}
   - component: {fileID: 312968904363350862}
   m_Layer: 0
-  m_Name: Pipe
+  m_Name: Top
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
