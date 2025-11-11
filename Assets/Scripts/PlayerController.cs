@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
 
     void PlayerMovement()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+        if (Input.GetKey(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
             // Reset velocity before applying force
             playerRb.velocity = Vector2.zero;

@@ -21,7 +21,33 @@ public class PipesMovement : MonoBehaviour
         leftEdge = Camera.main.ScreenToWorldPoint(Vector2.zero).x - 2f;
         startY = transform.position.y;
 
-        // Use level-based speed if LevelManager exists
+        // Get initial speed from LevelManager
+        UpdateSpeed();
+
+        // Subscribe to level changes
+        if (LevelManager.Instance != null)
+        {
+            LevelManager.OnDifficultyChanged += OnDifficultyChanged;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe when pipe is destroyed
+        if (LevelManager.Instance != null)
+        {
+            LevelManager.OnDifficultyChanged -= OnDifficultyChanged;
+        }
+    }
+
+    void OnDifficultyChanged(float speed, float gapSize, float powerUpInterval)
+    {
+        // Update speed when level changes
+        currentSpeed = speed;
+    }
+
+    void UpdateSpeed()
+    {
         if (LevelManager.Instance != null)
         {
             currentSpeed = LevelManager.Instance.CurrentSpeed;
